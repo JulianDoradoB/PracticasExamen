@@ -5,26 +5,28 @@ import { TextureLoader } from "three";
 
 const MovingRhombus = () => {
   const meshRef = useRef();
-
-  // Estado para cambiar textura
   const [activeTexture, setActiveTexture] = useState(0);
 
-  // Cargar dos texturas
+  // Cargar texturas
   const texture1 = useLoader(TextureLoader, "/assets/texture1.jpg");
   const texture2 = useLoader(TextureLoader, "/assets/texture2.jpg");
 
   const textures = [texture1, texture2];
 
-  // Animación
+  // Animación más suave
   useFrame((state, delta) => {
     if (meshRef.current) {
-      meshRef.current.rotation.x += delta;
-      meshRef.current.rotation.y += delta;
 
       const t = state.clock.getElapsedTime();
 
-      meshRef.current.position.x = Math.sin(t) * 2;
-      meshRef.current.position.y = Math.cos(t) * 2;
+      // Rotación suave
+      meshRef.current.rotation.x += delta * 0.5;
+      meshRef.current.rotation.y += delta * 0.3;
+
+      // Movimiento más natural
+      meshRef.current.position.x = Math.sin(t * 0.7) * 1.5;
+      meshRef.current.position.y = Math.cos(t * 0.7) * 1.2;
+      meshRef.current.position.z = Math.sin(t * 0.5) * 0.5;
     }
   });
 
@@ -35,13 +37,14 @@ const MovingRhombus = () => {
 
   return (
     <mesh ref={meshRef} onClick={changeTexture}>
-      {/* Geometría de rombo */}
-      <octahedronGeometry args={[3, 0]} />
+      
+      {/* Geometría rombo */}
+      <octahedronGeometry args={[2.5, 0]} />
 
       <meshStandardMaterial
         map={textures[activeTexture]}
-        roughness={0.8}
-        metalness={0.3}
+        roughness={0.6}
+        metalness={0.2}
       />
     </mesh>
   );
@@ -49,18 +52,23 @@ const MovingRhombus = () => {
 
 const Texturas = () => {
   return (
-    <Canvas camera={{ position: [0, 0, 10] }}>
-      
-      {/* Luz ambiente */}
-      <ambientLight intensity={1.5} />
+    <Canvas camera={{ position: [0, 0, 8] }}>
 
-      {/* Luz direccional */}
-      <directionalLight position={[5, 5, 5]} intensity={2} />
+      {/* Iluminación */}
+      <ambientLight intensity={1} />
 
+      <directionalLight
+        position={[5, 5, 5]}
+        intensity={1.5}
+      />
+
+      <pointLight position={[-5, 5, 5]} intensity={1} />
+
+      {/* Objeto */}
       <MovingRhombus />
 
-      {/* Control de cámara */}
-      <OrbitControls />
+      {/* Controles de cámara */}
+      <OrbitControls enableZoom={true} />
 
     </Canvas>
   );

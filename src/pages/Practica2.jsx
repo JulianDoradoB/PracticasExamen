@@ -3,13 +3,14 @@ import { OrbitControls, useGLTF } from "@react-three/drei"
 import { Suspense, useState } from "react"
 
 function ModeloInteractivo({ activarLuz }) {
+
   const { scene } = useGLTF("/models/Katana.glb")
 
-  // Activar sombras en todas las mallas
-  scene.traverse(child => {
-    if (child.isMesh) {
-      child.castShadow = true
-      child.receiveShadow = true
+  // Activar sombras en las mallas del modelo
+  scene.traverse((obj) => {
+    if (obj.isMesh) {
+      obj.castShadow = true
+      obj.receiveShadow = true
     }
   })
 
@@ -25,72 +26,101 @@ function ModeloInteractivo({ activarLuz }) {
 
 function Piso() {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+    <mesh
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, -0.01, 0]}
+      receiveShadow
+    >
       <planeGeometry args={[20, 20]} />
-      <meshStandardMaterial color="#444" roughness={0.8} />
+      <meshStandardMaterial color="#444444" roughness={0.8} />
     </mesh>
   )
 }
 
-// Luces que aparecen al hacer click
-function IluminacionAvanzada({ activa }) {
+function IluminacionExtra({ activa }) {
+
   if (!activa) return null
+
   return (
     <>
-      {/* Luz puntual muy fuerte */}
-      <pointLight position={[2, 3, 2]} intensity={12} distance={40} decay={2} color="#ffffff" castShadow />
-      {/* Luz tipo foco para dar contraste y sombras */}
-      <spotLight position={[0, 6, 5]} angle={0.5} intensity={10} penumbra={0.5} castShadow />
-      {/* Luz rectangular para iluminar desde un lado */}
-      <rectAreaLight position={[-3, 4, 1]} width={6} height={5} intensity={8} color="#ffffff" />
+      {/* Luz puntual fuerte */}
+      <pointLight
+        position={[2, 3, 2]}
+        intensity={10}
+        distance={40}
+        color="white"
+        castShadow
+      />
+
+      {/* Luz tipo foco */}
+      <spotLight
+        position={[0, 6, 5]}
+        angle={0.5}
+        intensity={8}
+        penumbra={0.5}
+        castShadow
+      />
+
+      {/* Luz lateral */}
+      <rectAreaLight
+        position={[-3, 4, 1]}
+        width={6}
+        height={5}
+        intensity={6}
+      />
     </>
   )
 }
 
 export default function Practica2() {
+
   const [luzActiva, setLuzActiva] = useState(false)
 
   return (
     <Canvas
       shadows
       camera={{ position: [3, 2, 5], fov: 60 }}
-      style={{ height: "100vh", width: "100%" }}
+      style={{ width: "100%", height: "100vh" }}
     >
-      {/* Luz ambiental general */}
+
+      {/* Luz ambiental */}
       <ambientLight intensity={0.5} />
 
-      {/* Luz hemisférica: cielo y suelo */}
-      <hemisphereLight skyColor={"#87ceeb"} groundColor={"#555555"} intensity={0.6} position={[0, 50, 0]} />
+      {/* Luz hemisférica */}
+      <hemisphereLight
+        skyColor="#87ceeb"
+        groundColor="#555"
+        intensity={0.6}
+        position={[0, 50, 0]}
+      />
 
-      {/* Luz direccional principal */}
+      {/* Luz principal */}
       <directionalLight
         position={[5, 10, 7]}
         intensity={1.2}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
-        shadow-camera-near={0.5}
-        shadow-camera-far={50}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
       />
 
-      {/* Luz direccional secundaria para llenar sombras */}
-      <directionalLight position={[-5, 10, -7]} intensity={0.8} castShadow={false} />
+      {/* Luz secundaria */}
+      <directionalLight
+        position={[-5, 10, -7]}
+        intensity={0.7}
+      />
 
       {/* Piso */}
       <Piso />
 
-      {/* Modelo y luces interactivas */}
+      {/* Modelo */}
       <Suspense fallback={null}>
-        <IluminacionAvanzada activa={luzActiva} />
+        <IluminacionExtra activa={luzActiva} />
         <ModeloInteractivo activarLuz={setLuzActiva} />
       </Suspense>
 
-      {/* Controles de cámara */}
+      {/* Controles */}
       <OrbitControls />
+
     </Canvas>
   )
 }

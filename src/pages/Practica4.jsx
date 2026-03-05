@@ -1,130 +1,134 @@
-import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import { useRef, useState } from "react";
 
-// ============================
-// Grupo A
-// Movimiento: rotación + pequeño rebote
-// ============================
-const GrupoA = () => {
+/* =========================
+   GRUPO A
+   Rotación + movimiento vertical
+========================= */
 
-    const grupoRef = useRef();
-    const [color, setColor] = useState("red");
+function GrupoA() {
 
-    useFrame((state) => {
-        const t = state.clock.getElapsedTime();
+  const refGrupo = useRef();
+  const [color, setColor] = useState("red");
 
-        if (grupoRef.current) {
-            grupoRef.current.rotation.y += 0.01;
-            grupoRef.current.position.y = Math.sin(t) * 0.5;
-        }
-    });
+  useFrame((state) => {
 
-    const cambiarColor = () => {
-        setColor(color === "red" ? "yellow" : "red");
-    };
+    const tiempo = state.clock.getElapsedTime();
 
-    return (
-        <group ref={grupoRef} position={[-4, 0, 0]} onClick={cambiarColor}>
+    if (refGrupo.current) {
+      refGrupo.current.rotation.y += 0.01;
+      refGrupo.current.position.y = Math.sin(tiempo) * 0.5;
+    }
 
-            <mesh position={[0, 0, 0]}>
-                <boxGeometry args={[1, 1, 1]} />
-                <meshStandardMaterial color={color} />
-            </mesh>
+  });
 
-            <mesh position={[2, 0, 0]}>
-                <torusGeometry args={[0.6, 0.2, 16, 32]} />
-                <meshStandardMaterial color={color} />
-            </mesh>
+  const cambiarColor = () => {
+    setColor((prev) => (prev === "red" ? "yellow" : "red"));
+  };
 
-            <mesh position={[1, 1.5, 0]}>
-                <coneGeometry args={[0.7, 1.2, 16]} />
-                <meshStandardMaterial color={color} />
-            </mesh>
+  return (
+    <group ref={refGrupo} position={[-4, 0, 0]} onClick={cambiarColor}>
 
-        </group>
-    );
-};
+      <mesh>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
 
+      <mesh position={[2, 0, 0]}>
+        <torusGeometry args={[0.6, 0.2, 16, 32]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
 
-// ============================
-// Grupo B
-// Movimiento: rotación en X + movimiento circular
-// ============================
-const GrupoB = () => {
+      <mesh position={[1, 1.5, 0]}>
+        <coneGeometry args={[0.7, 1.2, 16]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
 
-    const grupoRef = useRef();
-    const [color, setColor] = useState("blue");
+    </group>
+  );
+}
 
-    useFrame((state) => {
+/* =========================
+   GRUPO B
+   Movimiento circular + rotación
+========================= */
 
-        const t = state.clock.getElapsedTime();
+function GrupoB() {
 
-        if (grupoRef.current) {
+  const refGrupo = useRef();
+  const [color, setColor] = useState("blue");
 
-            grupoRef.current.rotation.x += 0.01;
+  useFrame((state) => {
 
-            grupoRef.current.position.x = 4 + Math.cos(t) * 1.5;
-            grupoRef.current.position.z = Math.sin(t) * 1.5;
-        }
+    const tiempo = state.clock.getElapsedTime();
 
-    });
+    if (refGrupo.current) {
 
-    const cambiarColor = () => {
-        setColor(color === "blue" ? "green" : "blue");
-    };
+      refGrupo.current.rotation.x += 0.01;
 
-    return (
-        <group ref={grupoRef} position={[4, 0, 0]} onClick={cambiarColor}>
+      refGrupo.current.position.x = 4 + Math.cos(tiempo) * 1.5;
+      refGrupo.current.position.z = Math.sin(tiempo) * 1.5;
 
-            <mesh position={[0, 0, 0]}>
-                <sphereGeometry args={[0.7, 32, 32]} />
-                <meshStandardMaterial color={color} />
-            </mesh>
+    }
 
-            <mesh position={[2, 0, 0]}>
-                <cylinderGeometry args={[0.5, 0.5, 1.2, 32]} />
-                <meshStandardMaterial color={color} />
-            </mesh>
+  });
 
-            <mesh position={[1, 1.5, 0]}>
-                <dodecahedronGeometry args={[0.7]} />
-                <meshStandardMaterial color={color} />
-            </mesh>
+  const cambiarColor = () => {
+    setColor((prev) => (prev === "blue" ? "green" : "blue"));
+  };
 
-        </group>
-    );
-};
+  return (
+    <group ref={refGrupo} position={[4, 0, 0]} onClick={cambiarColor}>
 
+      <mesh>
+        <sphereGeometry args={[0.7, 32, 32]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
 
-// ============================
-// Escena principal
-// ============================
-const Laboratorio4 = () => {
+      <mesh position={[2, 0, 0]}>
+        <cylinderGeometry args={[0.5, 0.5, 1.2, 32]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
 
-    return (
-        <Canvas camera={{ position: [8, 5, 8], fov: 50 }}>
+      <mesh position={[1, 1.5, 0]}>
+        <dodecahedronGeometry args={[0.7]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
 
-            <ambientLight intensity={0.5} />
+    </group>
+  );
+}
 
-            <directionalLight
-                position={[5, 5, 5]}
-                intensity={1}
-            />
+/* =========================
+   ESCENA PRINCIPAL
+========================= */
 
-            {/* Piso */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, 0]}>
-                <planeGeometry args={[20, 20]} />
-                <meshStandardMaterial color="gray" />
-            </mesh>
+export default function Laboratorio4() {
 
-            <GrupoA />
-            <GrupoB />
+  return (
+    <Canvas camera={{ position: [8, 5, 8], fov: 50 }}>
 
-            <OrbitControls />
+      {/* luces */}
+      <ambientLight intensity={0.5} />
 
-        </Canvas>
-    );
-};
+      <directionalLight
+        position={[5, 5, 5]}
+        intensity={1}
+      />
 
-export default Laboratorio4;
+      {/* piso */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, 0]}>
+        <planeGeometry args={[20, 20]} />
+        <meshStandardMaterial color="gray" />
+      </mesh>
+
+      {/* grupos */}
+      <GrupoA />
+      <GrupoB />
+
+      <OrbitControls />
+
+    </Canvas>
+  );
+}
